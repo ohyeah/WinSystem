@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>管理员列表</title>
+    <#include "/header.html">
+        </head>
+<body>
+<div id="rrapp" >
+    <div v-show="showtype==1">
+        <div class="grid-btn">
+                <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+                <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+                <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+        </div>
+
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="showtype==2" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">物料类型</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="item.type" placeholder="类型"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">物料编号</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" style="cursor:pointer;" v-model="item.number" placeholder="编号"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">名称</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="item.name" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">规格</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="item.specification"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">存储位编码</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="item.locNumber"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">数量</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="item.ammount"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label">单位</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="item.unit"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label">备注</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="item.remark"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!--<script src="${request.contextPath}/statics/js/modules/sys/user.js?_${.now?long}"></script>-->
+<script>
+    $(function () {
+        $("#jqGrid").jqGrid({
+            url: baseURL + 'biz/account/list',
+            datatype: "json",
+            colModel: [
+                /**
+                 * {"code":0,"page":{"totalCount":1,"pageSize":15,
+             * "totalPage":1,"currPage":1,
+             * "list":[{"goodid":0,"type":1,"number":"124545",
+             * "name":"物料A","specification":"规格","locNumber":"294857",
+             * "account":100.0,"unit":"个","remark":"测试","status":1}]}}
+                 *
+                 *
+                 * {"code":0,"page":{"totalCount":1,"pageSize":15,"totalPage":1,"currPage":1,"list":
+             * [{"goodid":0,"type":1,"number":"111","name":"111","specification":"111","locNumber":"111","account":111.0,"unit":"11","remark":"111","status":1}]}}
+                 */
+                { label: 'id', name: 'goodid', width: 10, key: true, hidedlg: true, hide: true},
+                { label: '类别', name: 'type', width: 75 },
+                { label: '编号', name: 'number', width: 75 },
+                { label: '名称', name: 'name', width: 90 },
+                { label: '规格型号', name: 'specification', width: 100 },
+                { label: '存储位编码', name: 'locNumber', width: 100},
+                { label: '数量', name: 'account', width: 85},
+                { label: '单位', name: 'unit', width: 50},
+                { label: '备注', name: 'remark', width: 200, key: true },
+            ],
+            viewrecords: true,
+            height: 385,
+            rowNum: 10,
+            rowList : [10,30,50],
+            rownumbers: true,
+            rownumWidth: 25,
+            autowidth:true,
+            multiselect: true,
+            pager: "#jqGridPager",
+            jsonReader : {
+                root: "page.list",
+                page: "page.currPage",
+                total: "page.totalPage",
+                records: "page.totalCount"
+            },
+            prmNames : {
+                page:"page",
+                rows:"limit",
+                order: "order"
+            },
+            gridComplete:function(){
+                //隐藏grid底部滚动条
+                $("#jqGrid").closest(".ui-jqgrid-bdiv").css({ "overflow-x" : "hidden" });
+            }
+        });
+    });
+
+    var vm = new Vue({
+        el: '#rrapp',
+        data: {
+            showtype: 1,
+            title: null,
+            state: 0,  // 1: 新增, 2: 更新
+            item: {
+                type: null,
+                number: null,
+                name: null,
+                specification: null,
+                locNumber: null,
+                ammount: 0,
+                unit: null,
+                remark: null
+            }
+        },
+        methods: {
+            add: function() {
+                vm.state =  1;
+                vm.showtype = 2;
+                vm.title = '新增物料';
+            },
+            update: function () {
+                vm.state = 2;
+                vm.showtype = 2;
+                vm.title = '修改物料'
+
+                var goodid = getSelectedRow();
+            },
+            storage: function() {
+                vm.showtype = 3;
+                vm.title = '入库'
+            },
+            saveOrUpdate: function() {
+                var url = baseURL;
+                if (vm.state == 1) {
+                    url += "biz/account/add";
+                } else if (state == 2) {
+                    url += "biz/account/update";
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    contentType: "application/json",
+                    data: JSON.stringify(vm.item),
+                    success: function(r) {
+                        if (r.code === 0) {
+                            alert('操作成功', function () {
+                                vm.reload();
+                            });
+                        } else {
+                            alert(r.msg);
+                        }
+                    }
+                })
+
+            },
+            del: function() {
+
+            },
+            reload: function() {
+                vm.showtype = 1;
+                vm.state = 0;
+                var page = $("#jqGrid").jqGrid('getGridParam','page');
+                $("#jqGrid").jqGrid('setGridParam',{
+                    page:page
+                }).trigger("reloadGrid");
+            }
+        }
+    });
+</script>
+</body>
+</html>

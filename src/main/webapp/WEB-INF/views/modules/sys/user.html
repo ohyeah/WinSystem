@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>管理员列表</title>
+    <#include "/header.html">
+</head>
+<body>
+<div id="rrapp">
+    <div>
+        <div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.username" @keyup.enter="query" placeholder="用户名">
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+            <!-- ShiroTag实现标签 -->
+            <#if shiro.hasPermission("sys:user:save")>
+                <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+            </#if>
+            <#if shiro.hasPermission("sys:user:update")>
+                <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+            </#if>
+            <#if shiro.hasPermission("sys:user:delete")>
+                <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+            </#if>
+        </div>
+        <table id="gridTable"></table>
+        <div id="ablePager"></div>
+    </div>
+</div>
+
+
+<!--<script src="${request.contextPath}/statics/js/modules/sys/user.js?_${.now?long}"></script>-->
+<script>
+    $(function () {
+        $("#gridTable").jqGrid({
+            width:930,
+            dataType:'local',
+            colNames:["国家/地区/组织代码","国家/地区/组织名称","操作","国家/地区/组织代码","国家/地区/组织名称","操作"],
+            colModel:[
+                {name:"code",index:"code",align:'center'},
+                {name:"name",index:"name",align:'center'},
+                {name:"operation",index:"operation",align:'center'},
+                {name:"code1",index:"code1",align:'center'},
+                {name:"name1",index:"name1",align:'center'},
+                {name:"operation1",index:"operation1",align:'center'},
+            ],
+            viewrecords:true,
+            rowNum:15,
+            //autoHeight:true,
+            rowList:[15,20,25,30],
+            jsonReader:{
+                root: "rows",
+                page: "page",
+                total: "total",
+                records: "records",
+                repeatitems: false
+
+            },
+            pager:"#tablePager",
+        });
+
+        var rows = [
+            {"code":"CN","name":"中国","operation":"<span style='color:blue;cursor:pointer;'>应用</span>","code1":"US","name1":"美国","operation1":"<span style='color:blue;cursor:pointer;'>应用</span>"},
+            {"code":"JP","name":"日本","operation":"<span style='color:blue;cursor:pointer;'>应用</span>","code1":"KR","name1":"韩国","operation1":"<span style='color:blue;cursor:pointer;'>应用</span>"},
+            {"code":"RU","name":"俄罗斯联邦","operation":"<span style='color:blue;cursor:pointer;'>应用</span>","code1":"EP","name1":"欧洲专利局","operation1":"<span style='color:blue;cursor:pointer;'>应用</span>"},
+            {"code":"WO","name":"世界知识产权组织","operation":"<span style='color:blue;cursor:pointer;'>应用</span>","code1":"AD","name1":"安道尔","operation1":"<span style='color:blue;cursor:pointer;'>应用</span>"},
+            {"code":"AE","name":"阿拉伯联合酋长国","operation":"<span style='color:blue;cursor:pointer;'>应用</span>","code1":"AF","name1":"阿富汗","operation1":"<span style='color:blue;cursor:pointer;'>应用</span>"},
+            {"code":"AG","name":"安提瓜和巴布达","operation":"<span style='color:blue;cursor:pointer;'>应用</span>","code1":"AI","name1":"安圭拉","operation1":"<span style='color:blue;cursor:pointer;'>应用</span>"},
+            {"code":"AL","name":"阿尔巴尼亚","operation":"<span style='color:blue;cursor:pointer;'>应用</span>","code1":"AM","name1":"亚美尼亚","operation1":"<span style='color:blue;cursor:pointer;'>应用</span>"},
+            {"code":"AN","name":"荷属安的列斯群岛","operation":"<span style='color:blue;cursor:pointer;'>应用</span>","code1":"AO","name1":"安哥拉","operation1":"<span style='color:blue;cursor:pointer;'>应用</span>"},
+            {"code":"AP","name":"非洲地区工业产权组织（ARIPO）","operation":"<span style='color:blue;cursor:pointer;'>应用</span>","code1":"AR","name1":"阿根廷","operation1":"<span style='color:blue;cursor:pointer;'>应用</span>"},
+            {"code":"AS","name":"美属萨摩亚","operation":"<span style='color:blue;cursor:pointer;'>应用</span>","code1":"AT","name1":"奥地利","operation1":"<span style='color:blue;cursor:pointer;'>应用</span>"},
+
+        ];
+        for(var i=0;i<rows.length;i++){
+            console.log("test: " + i);
+            $("#gridTable").jqGrid("addRowData",i+1,rows[i]);
+        }
+    });
+</script>
+</body>
+</html>

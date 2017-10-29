@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.sys.dao.BizAccountDao">
+    <select id="queryAllGoods" resultType="io.renren.modules.sys.entity.BizGoodsEntity">
+        select * from biz_goods b where b.status = true
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <insert id="addItem" parameterType="io.renren.modules.sys.entity.BizGoodsEntity"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into biz_goods
+        (
+        `goodid`,
+        `type`,
+        `number`,
+        `name`,
+        `specification`,
+        `ammount`,
+        `locnumber`,
+        `unit`,
+        `remark`,
+        `status`
+        )
+        values
+        (
+        #{goodid},
+        #{type},
+        #{number},
+        #{name},
+        #{specification},
+        #{ammount},
+        #{locNumber},
+        #{unit},
+        #{remark},
+        #{status},
+        1
+        )
+    </insert>
+
+    <update id="updateItem" parameterType="io.renren.modules.sys.entity.BizGoodsEntity">
+        update biz_goods
+        <set>
+            <if test="goodid != null">`goodid` = #{goodid}, </if>
+            <if test="type != null">`type` = #{type}, </if>
+            <if test="number != null">`number` = #{number}, </if>
+            <if test="name != null">`name` = #{name}, </if>
+            <if test="specification != null">`specification` = #{specification}, </if>
+            <if test="ammount != null">`ammount` = #{ammount}, </if>
+            <if test="locnumber != null">`locnumber` = #{locNumber}</if>
+            <if test="unit != null">`unit` = #{unit}</if>
+            <if test="remark != null">`remark` = #{remark}</if>
+        </set>
+        where goodid = #{goodid}
+    </update>
+</mapper>
